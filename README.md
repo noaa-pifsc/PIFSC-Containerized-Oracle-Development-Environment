@@ -43,6 +43,8 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
             -   The CODE is the first repository shown at the top of the diagram and serves as the basis for all forked repositories for specific data systems
         -   [DSC CODE](https://github.com/noaa-pifsc/PIFSC-DSC-Containerized-Oracle-Development-Environment)
         -   [Centralized Authorization System (CAS) CODE](https://github.com/noaa-pifsc/PIFSC-CAS-Containerized-Oracle-Development-Environment)
+        -   [PIFSC Resource Inventory (PRI) CODE](https://github.com/noaa-pifsc/PIFSC-PRI-Containerized-Oracle-Development-Environment)
+        -   [Centralized Utilities (CU) CODE](https://github.com/noaa-pifsc/PIFSC-CU-Containerized-Oracle-Development-Environment)
     -   The examples or repositories that have not been implemented yet are shown in orange  
 ![CODE Repository Fork Diagram](./docs/CODE_fork_diagram.drawio.png)
 
@@ -100,10 +102,10 @@ There are two different runtime scenarios implemented in this project:
             -   [README.md](./README.md) to reference any changes in the upstream README.md that are relevant
             -   [.env](./docker/.env) to retain the APP_SCHEMA_NAME or any other project-specific information (e.g. TARGET_APEX_VERSION)
         -   Reject:
-            -   [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh)
-            -   [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh)
             -   [custom-docker-compose.yml](./docker/custom-docker-compose.yml)
             -   [custom_deployment_functions.sh](./deployment_scripts/functions/custom_deployment_functions.sh)
+            -   [custom_db_app_deploy.sh](./docker/src/deployment_scripts/custom_db_app_deploy.sh)
+            -   [custom_container_config.sh](./docker/src/deployment_scripts/config/custom_container_config.sh)
 
 ## Container Architecture
 -   The db container is built from an official Oracle database image (defined by DB_IMAGE in [.env](./docker/.env)) maintained in the Oracle container registry
