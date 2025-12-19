@@ -65,7 +65,6 @@ There are two different runtime scenarios implemented in this project:
 ## Automated Deployment Process
 -   ### Prepare the project
     -   Recursively clone (use --recurse-submodules option) the [CODE repository](#code-version-control-information) to a working directory
-        -   Initialize and update the submodules recursively (git submodule update --init --recursive) 
 -   ### Build and Run the container 
     -   Execute the [build_deploy_project.sh](./deployment_scripts/build_deploy_project.sh) bash script with an environment name parameter (dev, test, prod) or if you don't specify an environment name the script will prompt you
     -   Scenarios:
