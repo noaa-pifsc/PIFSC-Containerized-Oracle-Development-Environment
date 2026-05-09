@@ -50,6 +50,12 @@ to do:
 			X deploy with volume purge
 	
 		
+		_ look to automate the deployment of the various database scripts in the CODE forks
+			_ we could specify the relative script path and then the db secrets (username, password) that are supplied with the database script.  If they can be specified in array arguments then a bash function might be able to loop through the database scripts and specify the credentials
+			
+
+		_ place the .deploy_ready in a subfolder to not clutter up the apex static files folder
+		
 		
 		
 	

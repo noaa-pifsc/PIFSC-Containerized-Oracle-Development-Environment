@@ -2,12 +2,7 @@ services:
   code-ords:
     networks:
       - oracle-net
-    image: pifsc/code-ords:latest
-    build:
-      context: ..
-      dockerfile: containerized_oracle_development_environment/Dockerfile.ords
-      args:
-        ORDS_IMAGE: ${ORDS_IMAGE}
+    image: ${ORDS_IMAGE}
     volumes:
       # This points to the new shared Docker volume to allow the apex installation/upgrade to be handled by a separate container
       - code-apex-static-vol:/opt/oracle/ords/static
@@ -21,8 +16,22 @@ services:
       - DBPORT=${DBPORT}
       - DBSERVICENAME=${DBSERVICENAME}
       - DEPLOY_ID=${DEPLOY_ID}
-    # Intercept the startup to wait for the deploy script's flag file, then inject the secret as explicit environment variables before starting ORDS.
-    entrypoint: ["/bin/bash", "/usr/local/bin/ords_startup.sh"]
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        echo 'The current deployment ID is: ${DEPLOY_ID}'
+        echo 'Waiting for database deployment to finish:'
+        while [ ! -f /opt/oracle/ords/static/.deploy_ready_${DEPLOY_ID} ]; do
+          sleep 5
+          echo 'Still waiting for database deployment to finish...'
+        done
+        echo 'Database Deployment Completed! Injecting secrets and starting ORDS'
+        export ORACLE_PWD=$$(cat /run/secrets/oracle_pwd)
+        export ORDS_PWD=$$(cat /run/secrets/oracle_pwd)
+        ords config set --global standalone.static.path "/opt/oracle/ords/static"
+        echo 'Starting official ORDS entrypoint'
+        docker-entrypoint.sh
     secrets:
       - oracle_pwd
     deploy:
