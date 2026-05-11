@@ -525,8 +525,10 @@ EOF
 	fi
 
 	# apex has finished installing, create the /apex-static/.deploy_read_${arg_ref[deploy_id]} file to indicate that the ords container can start now:
-	echo "Create the new deployment metadata file to indicate that the apex installation has completed: /apex-static/.deploy_ready_${arg_ref[deploy_id]}"
-	touch "/apex-static/.deploy_ready_${arg_ref[deploy_id]}"	
+	echo "Create the new deployment metadata file to indicate that the apex installation has completed: /apex-static/deployments/.deploy_ready_${arg_ref[deploy_id]}"
+
+	mkdir -p "/apex-static/deployments/"	# create the deployments subfolder to not clutter up the apex static folder
+	touch "/apex-static/deployments/.deploy_ready_${arg_ref[deploy_id]}"	
 }
 
 # function that moves the static application files to the designated folder

@@ -58,6 +58,26 @@ to do:
 		
 		_ create separate secret variables for the various apex and ords accounts 
 			apex admin, ords_public_user, apex_public_user, 
+
+
+		folder structure:
+			README.md
+			CODE_core
+				functions
+				scripts
+				templates
+				modules
+					CDS
+			projects
+				orchestration_manifests
+					project-name
+						project.env
+						overrides.yml
+						hooks
+				submodules
+					project-name (git submodule)
+
+
 		
 	
 	document
@@ -344,62 +364,62 @@ Key:
 
 testing:
 	server:
-		X deploy
-			X test
-				X installs db, ords, apex from scratch
-					X verify ORDS/Apex login
-					X verify DB connectivity
-						X Create temp table and insert data
+		_ deploy
+			_ test
+				_ installs db, ords, apex from scratch
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
+						_ Create temp table and insert data
 
-				X ORDS_ENABLED:
-					X yes
-						X validation:
-							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							X incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-					X no
-						X verify DB connectivity
+				_ ORDS_ENABLED:
+					_ yes
+						_ validation:
+							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+					_ no
+						_ verify DB connectivity
 
-			X dev
-				X installs db, ords, apex from scratch
-					X verify ORDS/Apex login
-					X verify DB connectivity
-						X Create temp table and insert data
-				X (same TARGET_APEX_VERSION) resume db, ords, apex
-					X verify ORDS/Apex login
-					X verify DB connectivity
-						X verify temp table
-				X (increase TARGET_APEX_VERSION) resume db, ords, apex
-					X verify ORDS/Apex login
-					X verify DB connectivity
-						X verify temp table
-				X ORDS_ENABLED:
-					X yes
+			_ dev
+				_ installs db, ords, apex from scratch
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
+						_ Create temp table and insert data
+				_ (same TARGET_APEX_VERSION) resume db, ords, apex
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
+						_ verify temp table
+				_ (increase TARGET_APEX_VERSION) resume db, ords, apex
+					_ verify ORDS/Apex login
+					_ verify DB connectivity
+						_ verify temp table
+				_ ORDS_ENABLED:
+					_ yes
 						validation:
-							X decrease TARGET_APEX_VERSION
-							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							X incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-					X no
-						X verify DB connectivity
-				X REM_VOL
-					X yes - remove al_ volumes
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X Create temp table and insert data
+							_ decrease TARGET_APEX_VERSION
+							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+					_ no
+						_ verify DB connectivity
+				_ REM_VOL
+					_ yes - remove al_ volumes
+						_ verify ORDS/Apex login
+						_ verify DB connectivity
+							_ Create temp table and insert data
 	
-		X shutdown
-			X test
+		_ shutdown
+			_ test
 				_ REM_VOL
 					_ yes
 					_ no
 			
-			X dev
-				X REM_VOL
-					X yes
-					X no
+			_ dev
+				_ REM_VOL
+					_ yes
+					_ no
 
-		_ specia_ scenario:
+		_ special scenario:
 			ORDS_ENABLED = yes
-				_X deploy dev
+				_ deploy dev
 					_ verify ORDS/Apex login
 					_ verify DB connectivity
 				_ deploy test
@@ -423,31 +443,33 @@ testing:
 					_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
 					_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
 			_ dev
-				_ installs db, ords, apex from scratch
-					_ verify ORDS/Apex login
-					_ verify DB connectivity
-						_ Create temp table and insert data
-				_ (same TARGET_APEX_VERSION) resume db, ords, apex
-					_ verify ORDS/Apex login
-					_ verify DB connectivity
-						_ verify temp table
-				_ (increase TARGET_APEX_VERSION) resume db, ords, apex
+				L installs db, ords, apex from scratch
+					L verify ORDS/Apex login
+					L verify DB connectivity
+						L Create temp table and insert data
+				L (same TARGET_APEX_VERSION) resume db, ords, apex
+					L verify ORDS/Apex login
+					L verify DB connectivity
+						L verify temp table
+				_L (increase TARGET_APEX_VERSION) resume db, ords, apex
 					_ verify ORDS/Apex login
 					_ verify DB connectivity
 						_ verify temp table
 				_ ORDS_ENABLED:
-					_ yes
-						_ validation:
-							_ decrease TARGET_APEX_VERSION
-							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+					L yes
+						L validation:
+							L decrease TARGET_APEX_VERSION
+							L invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							L incorrect TARGET_APEX_VERSION (does not exist - 24.6)
 					_ no - ORDS container does not run
 						_ verify DB connectivity
-				_ REM_VOL
+				L REM_VOL
 					L yes - remove all volumes
-						_ verify ORDS/Apex login
-						_ verify DB connectivity
-							_ Create temp table and insert data
+						L verify ORDS/Apex login
+						L verify DB connectivity
+							L Create temp table and insert data
+					_ no - retain all volumes
+					
 		_ shutdown
 			_ test
 				_ REM_VOL
@@ -459,42 +481,41 @@ testing:
 					_ yes
 					_ no
 		
-		_ special_ scenarios:
+		L special_ scenarios:
 			ORDS enabled:
-				_ 1 (upgrade apex static files version only):
-					_ deploy dev - version 23.2
-						_ verify ORDS/Apex login
-						_ verify DB connectivity
-							_ create table/insert test data
+				L 1 (upgrade apex static files version only):
+					L deploy dev - version 23.1
+						L verify ORDS/Apex login
+						L verify DB connectivity
+							L create table/insert test data
 					
-					_ test dev rem_vo_ = no
-						(instal_ version 24.1: files and db)
-						_ verify ORDS/Apex login
-						_ verify DB connectivity
+					L test dev rem_vo_ = no
+						(install version 23.2: files and db)
+						L verify ORDS/Apex login
+						L verify DB connectivity
 					
-					_ deploy dev - version 24.1
+					L deploy dev - version 23.1
 						(upgrade database only, no need to install static files)
-						_ verify ORDS/Apex login
-						_ verify DB connectivity
-							_ verify database values from initial dev run are still in the database
+						L verify ORDS/Apex login
+						L verify DB connectivity
+							L verify database values from initial dev run are still in the database
 					
 				
-				2 (upgrade db apex version only): 
-					_ deploy dev - version 23.2
-						_ verify ORDS/Apex login
-						_ verify DB connectivity
-							_ create table/insert test data
+				L 2 (upgrade db apex version only): 
+					L deploy dev - version 23.1
+						L verify ORDS/Apex login
+						L verify DB connectivity
+							L create table/insert test data
 					
-					_ remove apex static volume: 
-						(shutdown test rem_vo_ = yes)
-						_ verify ORDS/Apex login
-						_ verify DB connectivity
+					L remove apex static volume: 
+						(shutdown test rem_vol = yes)
+						L confirm apex static dir volume is removed
 
-					_ deploy dev - version 23.2
+					L deploy dev - version 23.1
 						(instal_ static files only)
-						_ verify ORDS/Apex login
-						_ verify DB connectivity
-							_ verify database values from initial dev run are still in the database
+						L verify ORDS/Apex login
+						L verify DB connectivity
+							L verify database values from initial dev run are still in the database
 					
 
 			ORDS not enabled:

@@ -14,7 +14,7 @@ fi
 
 # wait for the code-db-ords-deploy Apex installation/upgrade process to finish
 echo "Waiting for database deployment to finish:"
-while [ ! -f /opt/oracle/ords/static/.deploy_ready_${DEPLOY_ID} ]; do
+while [ ! -f /opt/oracle/ords/static/deployments/.deploy_ready_${DEPLOY_ID} ]; do
   sleep 5
   echo "Still waiting for database deployment to finish..."
 done
