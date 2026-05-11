@@ -6,6 +6,8 @@ services:
     volumes:
       # This points to the new shared Docker volume to allow the apex installation/upgrade to be handled by a separate container
       - code-apex-static-vol:/opt/oracle/ords/static
+      # Mount the configuration script (ensure the file exists in your project directory)
+      - ./CODE_core_scripts/ords_scripts/ords_startup.sh:/usr/local/bin/ords_startup.sh
     ports:
       - target: 8080
         published: ${ORDS_HOST_PORT}
@@ -16,77 +18,7 @@ services:
       - DBPORT=${DBPORT}
       - DBSERVICENAME=${DBSERVICENAME}
       - DEPLOY_ID=${DEPLOY_ID}
-    entrypoint:
-      - /bin/bash
-      - -c
-      - |
-        # Define resource paths
-        CONFIG_DIR="/etc/ords/config"
-        PW_FILE="/run/secrets/oracle_pwd"
-
-        # validate the database admin password secret exists
-        if [ ! -f "$${PW_FILE}" ]; then
-            echo "Error: Secret oracle_pwd was not found."
-            exit 1
-        fi
-        
-        # wait for the deployment to finish
-        echo 'The current deployment ID is: ${DEPLOY_ID}'
-        echo 'Waiting for database deployment to finish:'
-        while [ ! -f /opt/oracle/ords/static/.deploy_ready_${DEPLOY_ID} ]; do
-          sleep 5
-          echo 'Still waiting for database deployment to finish...'
-        done
-        echo 'Database Deployment Completed! Injecting secrets and starting ORDS'
-        export ORACLE_PWD=$$(cat /run/secrets/oracle_pwd)
-        export ORDS_PWD=$$(cat /run/secrets/oracle_pwd)
-        export ORACLE_USR_PWD=$$(cat /run/secrets/oracle_pwd)
-
-        # create the default database pool configuration folder
-        mkdir -p "$${CONFIG_DIR}/databases/default"
-
-        # generate the pool.xml configuration file
-        echo "generate the pool.xml configuration file"
-        cat <<EOF > "$${CONFIG_DIR}/databases/default/pool.xml"
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-        <properties>
-        <comment>Generated dynamically for ORDS container based on database configuration values</comment>
-        <entry key="db.connectionType">basic</entry>
-        <entry key="db.hostname">${DBHOST}</entry>
-        <entry key="db.port">${DBPORT}</entry>
-        <entry key="db.servicename">${DBSERVICENAME}</entry>
-        <entry key="db.username">ORDS_PUBLIC_USER</entry>
-        <entry key="feature.sdw">true</entry>
-        <entry key="plsql.gateway.mode">proxied</entry>
-        <entry key="restEnabledSql.active">true</entry>
-        <entry key="security.requestValidationFunction">ords_util.authorize_plsql_gateway</entry>
-        </properties>
-        EOF
-        
-        # generate the global settings.xml configuration file
-        echo "generate the global settings.xml configuration file"
-       
-        mkdir -p "$${CONFIG_DIR}/global"
-       
-        cat <<EOF > "$${CONFIG_DIR}/global/settings.xml"
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-        <properties>
-        <comment>Generated dynamically for ORDS container based on database configuration values</comment>
-        <entry key="database.api.enabled">true</entry>
-        <entry key="mongo.enabled">true</entry>
-        <entry key="standalone.access.log">/tmp/ords_access_logs/</entry>
-        <entry key="standalone.static.context.path">/i</entry>
-        <entry key="standalone.static.path">/opt/oracle/ords/static</entry>
-        </properties>      
-        EOF
-        
-        # define the db.password securely with the secret value
-        echo "define the db password"
-        ords --config "$${CONFIG_DIR}" config secret --password-stdin db.password < "$${PW_FILE}"
-        echo 'Starting official ORDS entrypoint'
-        docker-entrypoint.sh
+    entrypoint: ["/bin/bash", "/usr/local/bin/ords_startup.sh"]
     secrets:
       - oracle_pwd
     deploy:
