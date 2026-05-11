@@ -56,7 +56,8 @@ to do:
 
 		_ place the .deploy_ready in a subfolder to not clutter up the apex static files folder
 		
-		
+		_ create separate secret variables for the various apex and ords accounts 
+			apex admin, ords_public_user, apex_public_user, 
 		
 	
 	document
@@ -510,7 +511,7 @@ testing:
 							_ verify database values from initial dev run are still in the database
 					
 				
-				2 (upgrade db apex version only): 
+				_ 2 (upgrade db apex version only): 
 					_ deploy dev
 						_ verify DB connectivity
 							_ create table/insert test data
