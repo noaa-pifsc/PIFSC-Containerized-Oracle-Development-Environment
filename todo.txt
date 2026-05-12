@@ -1,8 +1,12 @@
 
 to do:
 
-	_ test case for test deployment, rem_vol = yes, ords_enabled = no
-		There are no actual volumes for this, CDS shared functions should skip the processing
+	X redo test cases to nest the verification steps under the appropriate headings
+		5/11/26: use server version
+
+	X test case for test deployment, rem_vol = yes, ords_enabled = no
+		X (No Need) This will still remove the apex static volume because it's associated with CODE-db-deploy.yml
+
 
 	X update the configuration so users can specify a unique container name so it won't conflict with other containers on the same server (could allow multiple people to use a different shared container host for development)
 		e.g. GCP shared compute instance running docker, but it will depend on performance
@@ -75,11 +79,18 @@ to do:
 			projects
 				orchestration_manifests
 					project-name
-						project.env
+						project.env (recursively references parent project.env)
+							- load parent .env file
+							- add project-name (folder) to PROJECT_INHERITANCE
+							- add sql path, sql script, username, password to DB_MIGRATION_MAP (for each database script that is executed)
+							- add any custom environment variables that will be passed via environment variable to the other scripts to CUSTOM_ENV_VARS
+							- add any custom .yml files to COMPOSE_FILES 
 						overrides.yml
 						hooks
-				submodules
-					project-name (git submodule)
+							pre-deploy.sh
+							post-deploy.sh
+				modules
+					project-name (git submodules)
 
 
 		
@@ -367,47 +378,48 @@ Key:
 	V => Virtual Machine
 
 testing:
-	server:
-		_ deploy
-			_ test
-				_ installs db, ords, apex from scratch
-					_ verify ORDS/Apex login
-					_ verify DB connectivity
-						_ Create temp table and insert data
-
-				_ ORDS_ENABLED:
-					_ yes
-						_ validation:
-							_ invalid TARGET_APEX_VERSION (format fails - 24.3.1)
-							_ incorrect TARGET_APEX_VERSION (does not exist - 24.6)
-					_ no
-						_ verify DB connectivity
-
-				_ REM_VOL
-					_ yes - remove all volumes
-						_ ORDS enabled = yes
-							_ verify ORDS/Apex login
-							_ verify DB connectivity
-								_ Create temp table and insert data
-						_ ORDS enabled = no
-							_ verify DB connectivity
-					_ no - retain all volumes
-
-			X dev
-				X installs db, ords, apex from scratch
-					X verify ORDS/Apex login
-					X verify DB connectivity
-						X Create temp table and insert data
-				X (same TARGET_APEX_VERSION) resume db, ords, apex
-					X verify ORDS/Apex login
-					X verify DB connectivity
-						X verify temp table
-				X (increase TARGET_APEX_VERSION) resume db, ords, apex
-					X verify ORDS/Apex login
-					X verify DB connectivity
-						X verify temp table
+	_X server:
+		X deploy
+			X test
 				X ORDS_ENABLED:
 					X yes
+						X installs db, ords, apex from scratch
+							X verify ORDS/Apex login
+							X verify DB connectivity
+								X Create temp table and insert data
+						X validation:
+							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
+							X incorrect TARGET_APEX_VERSION (does not exist - 24.6)
+						X REM_VOL
+							X yes - remove apex static volume
+							X no - retain all volumes
+					X no
+						X REM_VOL
+							X yes - remove apex static volume
+								X verify DB connectivity
+							X no
+								X verify DB connectivity
+			X dev
+				X ORDS_ENABLED:
+					X yes
+						X installs db, ords, apex from scratch
+							X verify ORDS/Apex login
+							X verify DB connectivity
+								X Create temp table and insert data
+						X (same TARGET_APEX_VERSION) resume db, ords, apex
+							X verify ORDS/Apex login
+							X verify DB connectivity
+								X verify temp table
+						X (increase TARGET_APEX_VERSION) resume db, ords, apex
+							X verify ORDS/Apex login
+							X verify DB connectivity
+								X verify temp table
+						X REM_VOL
+							X yes - remove all volumes
+								X verify ORDS/Apex login
+								X verify DB connectivity
+									X Create temp table and insert data
+							X no - retain all volumes
 						X validation:
 							X decrease TARGET_APEX_VERSION (downgrade error)
 							X invalid TARGET_APEX_VERSION (format fails - 24.3.1)
@@ -419,25 +431,35 @@ testing:
 						X restart
 							X verify DB connectivity
 							X verify temp table
+						X REM_VOL
+							X yes - remove all volumes
+								X verify ORDS/Apex login
+								X verify DB connectivity
+									X Create temp table and insert data
+							X no - retain all volumes
+		X shutdown
+			X test
 				X REM_VOL
-					X yes - remove all volumes
-						X verify ORDS/Apex login
-						X verify DB connectivity
-							X Create temp table and insert data
-					X no - retain all volumes
-
-		_ shutdown
-			_ test
-				_ REM_VOL
-					_ yes (deletes only apex static volume)
-					_ no
-			
+					X yes
+						ORDS_ENABLED:
+							X yes: remove apex static volume
+							X no: remove apex static volume
+					X no
+						ORDS_ENABLED:
+							X yes: retain volumes
+							X no: retain volumes
 			X dev
 				X REM_VOL
 					X yes
+						ORDS_ENABLED:
+							X yes: remove apex static and db volumes
+							X no: remove apex static and db volumes
 					X no
+						ORDS_ENABLED:
+							X yes: retain volumes
+							X no: retain volumes
 
-		_ special scenario:
+		_ special scenarios:
 			X ORDS enabled:
 				X 1 (upgrade apex static files version only):
 					X deploy dev - version 23.1
@@ -474,32 +496,19 @@ testing:
 							X verify database values from initial dev run are still in the database
 					
 
-			ORDS not enabled:
-				_ 1 (upgrade apex static files version only):
-					_ deploy dev
-						_ verify DB connectivity
-							_ create table/insert test data
+			X ORDS not enabled:
+				X 1 (verify dev DB data is retained):
+					X deploy dev
+						X verify DB connectivity
+							X create table/insert test data
 					
-					_ deploy test
-						_ verify DB connectivity
+					X deploy test
+						X verify DB connectivity
 					
-					_ deploy dev
-						_ verify DB connectivity
-							_ verify database values from initial dev run are still in the database
+					X deploy dev
+						X verify DB connectivity
+							X verify database values from initial dev run are still in the database
 					
-				
-				_ 2 (upgrade db apex version only): 
-					_ deploy dev
-						_ verify DB connectivity
-							_ create table/insert test data
-					
-					_ deploy test
-						_ verify DB connectivity
-					
-					_ deploy dev
-						_ verify DB connectivity
-							_ verify database values from initial dev run are still in the database
-
 	_ local:
 		_ deploy
 			L test
