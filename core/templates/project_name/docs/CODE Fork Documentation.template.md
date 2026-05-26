@@ -56,7 +56,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) project was develope
 -   Refer to the [Monitoring and Syncing Upstream Updates](../../../../core/docs/CODE%20Documentation.md#monitoring-and-syncing-upstream-updates) for details
 
 ## Connection Information
--   Refer to the CODE [Connection Information](../../../../core/docs/CODE%20Documentation.md/-/blob/main/README.md?ref_type=heads#connection-information) for details
+-   Refer to the CODE [Connection Information](../../../../core/docs/CODE%20Documentation.md#connection-information) for details
     -   The individual account passwords can be found in the /secrets/secrets.sh file 
 
 ## Security Features

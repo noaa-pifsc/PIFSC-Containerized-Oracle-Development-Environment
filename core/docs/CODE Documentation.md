@@ -176,6 +176,7 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
         -   rem_vol: remove volume flag is "yes" to remove the volumes associated with the CODE container stack name or "no" to retain the volumes
             -   \*Note: if a volume is removed the data contained within it is lost, caution is advised to ensure that work is not lost or it's saved before the volume(s) are removed.
     -   #### File-Based    
+        -   \*Note: the file-based runtime configuration is defined in [default_CODE_runtime_config.sh](../scripts/config/default_CODE_runtime_config.sh) and in each linear dependency defined in the [projects](../../projects) folders (starting with the parent forks down the chain until the $ACTIVE_PROJECT_NAME)
         -   APP_SCHEMA_NAME is the database schema that will be used to check if the database schemas have been installed, this only applies to the [development runtime scenario](#development)
         -   DB_IMAGE is the path to the database image used to build the database contianer (code-db container)
             -   This can be updated if a specific version of the database is required
@@ -384,9 +385,9 @@ The PIFSC Containerized Oracle Developer Environment (CODE) framework was develo
     -   Push Upstream Changes to the CODE fork: `git push origin main` 
 
 ## Connection Information
-For the following connections refer to the active [file-based configuration](#file-based) and the /secrets/secrets.sh for the corresponding $ORACLE_PWD value
--   \*Note: For server deployments the following command can create an SSH tunnel between the server and the developer workstation to allow the following URLs to connect to the corresponding server endpoints (where the variable references match the runtime values when the CODE containers were deployed):
-    -   `ssh -N -L ${ORDS_HOST_PORT}:localhost:${ORDS_HOST_PORT} -L ${DB_HOST_PORT}:localhost:${DB_HOST_PORT} dev_docker`
+For the following connections refer to the active [file-based configuration](#file-based) and the /secrets/secrets.sh for the corresponding variable values
+-   \*Note: For server deployments the following command can create an SSH tunnel between the server and the developer workstation to allow the following URLs to connect to the corresponding server endpoints:
+    -   `ssh -N -L ${ORDS_HOST_PORT}:localhost:${ORDS_HOST_PORT} -L ${DB_HOST_PORT}:localhost:${DB_HOST_PORT} ${HOSTNAME}`
 -   Database connections:
     -   hostname: localhost:\$\{DB_HOST_PORT\}/$\{DBSERVICENAME\}
     -   username: SYSTEM or SYS AS SYSDBA
